@@ -1,0 +1,164 @@
+class Astar {
+  constructor(grid, pos, targ) {
+    this.openSet = [];
+    this.openSet.push(pos);
+    this.closedSet = [];
+    this.start = pos;
+    this.end = targ;
+    this.path = [];
+    this.map = grid;
+  }
+
+  calculateBestPath() {
+    let solution = 0;
+    while (solution == 0) {
+      if (this.openSet.length > 0) {
+        // Best next option
+        var winner = 0;
+        for (var i = 1; i < this.openSet.length; i++) {
+          if (this.openSet[i].f < this.openSet[winner].f) {
+            winner = i;
+          }
+          //if we have a tie according to the standard heuristic
+          if (this.openSet[i].f == this.openSet[winner].f) {
+            //Prefer to explore options with longer known paths (closer to goal)
+            if (this.openSet[i].g > this.openSet[winner].g) {
+              winner = i;
+            }
+            //if we're using Manhattan distances then also break ties
+            //of the known distance measure by using the visual heuristic.
+            //This ensures that the search concentrates on routes that look
+            //more direct. This makes no difference to the actual path distance
+            //but improves the look for things like games or more closely
+            //approximates the real shortest path if using grid sampled data for
+            //planning natural paths.
+
+            if (this.openSet[i].g == this.openSet[winner].g &&
+              this.openSet[i].vh < this.openSet[winner].vh) {
+              winner = i;
+            }
+          }
+        }
+        var current = this.openSet[winner];
+        this.lastCheckedNode = current;
+
+        // Did I finish?
+        if (current === this.end) {
+          solution = 1;
+          break;
+        }
+
+        // Best option moves from openSet to closedSet
+        this.removeFromArray(this.openSet, current);
+        this.closedSet.push(current);
+
+        // Check all the neighbors
+        var neighbors = current.getNeighbors();
+
+        for (var i = 0; i < neighbors.length; i++) {
+          var neighbor = neighbors[i];
+
+          // Valid next spot?
+
+          debugger;
+          if (!this.closedSet.includes(neighbor) && !neighbor.shelf) { // && !neighbor.wall && !neighbor.shelf && !(neighbor.agent.length > 0 || neighbor.agent.includes(this.start) && neighbor.agent.length > 1)
+            // Is this a better path than before?
+            var tempG = current.g + this.heuristic(neighbor, current);
+
+            // Is this a better path than before?
+            if (!this.openSet.includes(neighbor)) {
+              this.openSet.push(neighbor);
+            } else if (tempG >= neighbor.g) {
+              // No, it's not a better path
+              continue;
+            }
+
+            neighbor.g = tempG;
+            neighbor.h = this.heuristic(neighbor, this.end);
+            neighbor.vh = this.visualDist(neighbor, this.end);
+            neighbor.f = neighbor.g + neighbor.h;
+            neighbor.previous = current;
+          }
+        }
+        solution = 0;
+        // Uh oh, no solution
+      } else {
+        console.log('no solution');
+        solution = -1;
+        break;
+      }
+    }
+    return this.openSet;
+  }
+
+  removeFromArray(array, element) {
+    for (var i = array.length - 1; i >= 0; i--) {
+      if (array[i] == element) {
+        array.splice(i, 1);
+      }
+    }
+  }
+
+  heuristic(a, b) {
+    // var d = dist(a.x, a.y, b.x, b.y);
+    var d = abs(a.x - b.x) + abs(a.y - b.y);
+    return d;
+  }
+
+  visualDist(a, b) {
+    return dist(a.i, a.j, b.i, b.j);
+}
+
+  // calculateBestPath() {
+  //   let solucao = false;
+  //   while (solucao === false) {
+  //     if (this.openSet.length > 0) {
+  //       var lowestIndex = 0;
+  //       for (var i = 0; i < this.openSet.length; i++) {
+  //         if (this.openSet[i].f < this.openSet[lowestIndex].f) {
+  //           lowestIndex = i;
+  //         }
+  //       }
+  //       var current = this.openSet[lowestIndex];
+  //       if (this.openSet[lowestIndex] === this.end) {
+  //         debugger;
+  //         solucao = true;
+  //       }
+  //       removeFromArray(this.openSet, current);
+  //       this.closedSet.push(current);
+  //
+  //       var neighbors = current.neighbors;
+  //       for (var i = 0; i < neighbors.length; i++) {
+  //         var neighbor = neighbors[i];
+  //         if (!this.closedSet.includes(neighbor) && !neighbor.wall && !neighbor.Shelf && !(neighbor.agent.length > 0 || neighbor.agent.includes(this.start) && neighbor.agent.length > 1)) {
+  //           var tempG = current.g + 1;
+  //           var newPath = false;
+  //           if (this.openSet.includes(neighbor)) {
+  //             if (tempG < neighbor.g) {
+  //               neighbor.g = tempG;
+  //               newPath = true;
+  //             }
+  //           } else {
+  //             neighbor.g = tempG;
+  //             newPath = true;
+  //             this.openSet.push(neighbor);
+  //           }
+  //           if (newPath) {
+  //             neighbor.h = heuristic(neighbor, this.end);
+  //             neighbor.f = neighbor.g + neighbor.h;
+  //             neighbor.previous = current;
+  //           }
+  //         }
+  //       }
+  //     } else if (this.openSet.length > 0 && solucao === true) {
+  //       return openSet;
+  //       debugger;
+  //     } else {
+  //       console.log("Sem Solução");
+  //       debugger;
+  //       return;
+  //     }
+  //   }
+  //   return this.openSet;
+  // }
+}
