@@ -6,6 +6,7 @@ class Cell {
     this.agent = [];
     this.shelf = false;
     this.isTarget = false;
+    this.receptor = false;
     this.cellUp;
     this.cellRight;
     this.cellDown;
@@ -32,7 +33,14 @@ class Cell {
       fill(38, 166, 154);
     }
     if (this.isTarget) {
-      fill(24, 255, 255);
+      if (this.shelf) {
+        fill(24, 255, 255);
+      } else {
+
+      }
+    }
+    if (this.receptor) {
+      fill(155, 130, 200);
     }
     if (this.depositAreaEntrance) {
       fill(255, 214, 0);
@@ -47,7 +55,13 @@ class Cell {
       fill(255);
       for (let i = 0; i < this.agent.length; i++) {
         if (this.agent[i].activeShelf != undefined) {
-          fill(24, 255, 255);
+          if (this.agent[i].status == "returning" || this.agent[i].status == "delivered") {
+            fill(120, 210, 110);
+          } else if (this.agent[i].status == "carrying" || this.agent[i].status == "inDeliveryZone") {
+            fill(255, 210, 150);
+          } else {
+            fill(24, 255, 255);
+          }
         }
       }
       ellipse(this.x * w + w / 2, this.y * h + h / 2, w - 1, h - 1);

@@ -2,10 +2,14 @@
 
 <head>
   <meta charset="UTF-8">
-  <script language="javascript" type="text/javascript" src="p5.js"></script>
+  <!-- Includes -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script language="javascript" type="text/javascript" src="addons/p5.js"></script>
   <script language="javascript" type="text/javascript" src="addons/p5.dom.js"></script>
   <script language="javascript" type="text/javascript" src="sketch.js"></script>
   <script language="javascript" type="text/javascript" src="./libraries/cell.js"></script>
+  <script language="javascript" type="text/javascript" src="./libraries/receptor.js"></script>
+  <script language="javascript" type="text/javascript" src="./libraries/pedido.js"></script>
   <script language="javascript" type="text/javascript" src="./libraries/agent.js"></script>
   <script language="javascript" type="text/javascript" src="./libraries/nn.js"></script>
   <script language="javascript" type="text/javascript" src="./libraries/ga.js"></script>
@@ -13,68 +17,21 @@
   <script language="javascript" type="text/javascript" src="./libraries/matrix.js"></script>
   <script language="javascript" type="text/javascript" src="./js/materialize.min.js"></script>
   <link href="./css/materialize.min.css" rel="stylesheet" />
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-  <style>
-    body {
-      padding: 20px;
-    }
-
-    label {
-      font-weight: bold;
-    }
-
-    table tbody tr th {
-      font-size: 9px;
-      padding-top: 2px;
-      padding-bottom: 2px;
-      text-align: center;
-    }
-
-    table tbody tr td {
-      font-size: 11px;
-      padding-top: 0px;
-      padding-bottom: 0px;
-      text-align: center;
-    }
-
-    .b_red {
-      background-color: #EF5350;
-      color: white;
-    }
-
-    .b_blue {
-      background-color: #5C6BC0;
-      color: white;
-    }
-
-    .b_teal {
-      background-color: #009688;
-      color: white;
-    }
-
-    .b_green1 {
-      background-color: #A5D6A7;
-      color: white;
-    }
-
-    .b_green2 {
-      background-color: #66BB6A;
-      color: white;
-    }
-
-    .b_green3 {
-      background-color: #43A047;
-      color: white;
-    }
-
-    .b_green4 {
-      background-color: #2E7D32;
-      color: white;
-    }
-  </style>
+  <link rel="stylesheet" href="css/custom.css">
+  <!-- Includes -->
 </head>
 
 <body class="grey lighten-5">
+  <nav class="blue-grey">
+    <ul>
+      <li>
+        <a href="genetic.html">Algoritmo Genético</a>
+      </li>
+      <li>
+        <a href="astar.html">Algoritmo A*</a>
+      </li>
+    </ul>
+  </nav>
   <div class="row">
     <div class="col m6 s12">
       <div class="card" style="height:800px">
@@ -116,7 +73,9 @@
         <div class="card-content">
           <label>Velocidade(</label>
           <label id="speed">1</label>
-          <span><label>)</label></span>
+          <span>
+            <label>)</label>
+          </span>
           <br/>
           <input id="speedSlider" type="range" min="-10" max="10" value="1" style="width:250px">
           <br/>
@@ -131,15 +90,18 @@
           <br/>
           <br/>
           <label>
-          <input type="checkbox" id="chkHideTableLines" />
-          <span>Esconder linhas de agentes inativos</span></label>
+            <input type="checkbox" id="chkHideTableLines" />
+            <span>Esconder linhas de agentes inativos</span>
+          </label>
           <br />
           <br />
           <br />
           <button class="btn btn-primary" id="best">Rodar somente o melhor até o momento</button>
           <br/>
           <br/>
-          <a href="javascript:void(0)" id="saveBest"><button class="btn btn-primary" onclick="saveBestAgentBrain()" id="saveBestButton ">Salvar melhor</button></a>
+          <a href="javascript:void(0)" id="saveBest">
+            <button class="btn btn-primary" onclick="saveBestAgentBrain()" id="saveBestButton ">Salvar melhor</button>
+          </a>
           <br/>
           <br/>
           <button class="btn btn-primary" onclick="loadBrain()">Carregar cérebro</button>

@@ -2,7 +2,7 @@
 Configurações do espaço de trabalho
 ***********************************/
 
-//Largura e altura da vizualização do espaço
+//Largura e altura do espaço de visualização
 let w, h;
 //Quantidade de colunas do espaço útil
 let cols = 48;
@@ -22,7 +22,7 @@ let highScore = 0;
 //Contador de gerações
 let generation = 1;
 //População total para treinamento/execução
-let totalPopulation = 20;
+let totalPopulation = 25;
 
 /***********************************
  **************Agentes***************
@@ -35,7 +35,10 @@ let activeAgents = [];
 //Agente com melhor pontuação
 let bestAgent;
 
-/***********************************
+let receptores = [];
+
+/************************************
+ ***********Declaração de************
  ***********Elementos DOM************
  ***********************************/
 
@@ -51,21 +54,33 @@ let agTable;
 let runBestButton;
 //Botão para salvar o cérebro do melhor agente até o momento
 let saveBestButton;
-
+//Slider controlador da velocidade da simulação;
 let speedSlider;
+//Span que exibe a velocidade da simulação;
 let speedSpan;
-
+//Checkbox para exibir ou esconder a tabela de agentes
 let chkHide;
 
-/***********************************
+/************************************
  ********Outras propriedades*********
  ***********************************/
 
 // TODO: Encontrar outra forma de popular automaticamente as prateleiras
+
 //Colunas que são prateleiras
 let cShelf = [3, 4, 7, 8, 11, 12, 15, 16, 19, 20, 23, 24, 27, 28, 31, 32, 35, 36, 39, 40, 43, 44];
 //Linhas que não são prateleiras
 let rNotShelf = [0, 1, 2, 9, 10, 17, 18, 25, 26, 33, 34, 41, 42, 43, 44, 45, 46, 47];
+
+let rReceptor = [4, 8, 12, 16, 20, 24, 28, 32, 36, 40, 44];
+
+/************************************
+ **************Funções***************
+ ***********************************/
+
+/**
+ * Função para rodar a simulação somente com o melhor agente ou continuar o treinamento com todos.
+ */
 
 function toggleState() {
   runBest = !runBest;
@@ -80,11 +95,19 @@ function toggleState() {
   }
 }
 
-function resetTable(){
+/**
+ * Função para resetar a tabela de agentes
+ */
+function resetTable() {
   for (var i = 0; i < allAgents.length - 1; i++) {
     updateAgentTableLine(i);
   }
 }
+
+/**
+ * Função que atualiza a linha da tabela de agentes de um determinado agente
+ * @param {number} agIndex - Índice da tabela de agentes que faz referência à linha correspondente da tabela
+ */
 
 function updateAgentTableLine(agIndex) {
 
@@ -108,7 +131,6 @@ function updateAgentTableLine(agIndex) {
       break;
     case "dead":
       cel_status.className = "b_red";
-      debugger;
       if (chkHide.checked()) {
         linha.style.display = "none";
       }
@@ -128,6 +150,10 @@ function updateAgentTableLine(agIndex) {
   }
 }
 
+/**
+ * Função que salva um arquivo JSON contendo os pesos dos perceptrons do agente de meelhor desempenho
+ */
+
 function saveBestAgentBrain() {
   if (bestAgent == undefined) {
     return;
@@ -143,11 +169,15 @@ function saveBestAgentBrain() {
   dlbtn.download = "bestBrain.json";
 }
 
+/**
+ * Função que carrega na pasta /best o arquivo com os pesos dos perceptrons nos agentes ativos
+ */
+
 function loadBrain() {
   noLoop();
   let rawFile = new XMLHttpRequest();
-  rawFile.open('GET', 'http://localhost:8000/bestBrain.json', true); // Replace 'appDataServices' with the path to your file
-  rawFile.onreadystatechange = function() {
+  rawFile.open('GET', 'http://localhost:8000/bestBrain.json', true);
+  rawFile.onreadystatechange = function () {
     if (rawFile.readyState === 4) {
       if (rawFile.status === 200 || rawFile.status == 0) {
         let responseText = rawFile.responseText;
@@ -216,7 +246,7 @@ function setup() {
   chkHide.mousePressed(resetTable);
   w = width / cols;
   h = height / cols;
-  //Construindo a matriz
+  //Construindo a matriz do espaço de trabalho
   for (let i = 0; i < cols; i++) {
     grid[i] = new Array(rows);
   }
@@ -242,13 +272,22 @@ function setup() {
     }
   }
 
+  for (let i = 0; i < 48; i++) {
+    if (rReceptor.includes(i)) {
+      grid[i][cols - 2].receptor = true;
+      let receptor = new Receptor();
+      receptor.celula = grid[i][cols - 2];
+      receptores.push(receptor);
+    }
+  }
+
   for (let i = 0; i < cols; i++) {
     for (let j = 0; j < rows; j++) {
       grid[i][j].addNeighbors(grid);
     }
   }
 
-  // Create a population
+  // Criando uma população
   for (let i = 0; i < totalPopulation; i++) {
     let randX;
     let randY;
@@ -261,7 +300,7 @@ function setup() {
     activeAgents[i] = agent;
     allAgents[i] = agent;
 
-    let linha = agTable.insertRow(); // document.createElement("TR");
+    let linha = agTable.insertRow();
     linha.id = ("linha_").concat(i + 1);
     let l1 = linha.insertCell();
     l1.id = (linha.id).concat("_").concat("name");
@@ -273,8 +312,6 @@ function setup() {
     l3.id = (linha.id).concat("_").concat("status");
     let l4 = linha.insertCell();
     l4.id = (linha.id).concat("_").concat("score");
-    // let l5 = linha.insertCell();
-    // l5.id = (linha.id).concat("_").concat("fitness");
     let l7 = linha.insertCell();
     l7.id = (linha.id).concat("_").concat("dist");
   }
@@ -335,7 +372,7 @@ function draw() {
         agent.previouscell.show();
         agent.cell.show();
 
-        if (k == 200) {
+        if (k == 0) {
           for (var i = 1; i < activeAgents[k].previousBestPath.length; i++) {
             grid[activeAgents[k].previousBestPath[i].x][activeAgents[k].previousBestPath[i].y].show();
           }

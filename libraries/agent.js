@@ -21,6 +21,7 @@ class Agent {
     this.timeWithoutHittingTarget = 0;
     this.timesHitShlelf = 0;
     this.status = "active";
+    this.pedido;
     this.activeShelf;
     this.generation = generation;
     this.hitCount = 0;
@@ -83,6 +84,8 @@ class Agent {
   generateName() {
     let abc = "abcdefghijklmnopqrstuvwxyz1234567890".split("");
     let token = "";
+    98
+
     for (let i = 0; i < 16; i++) {
       token += abc[Math.floor(Math.random() * abc.length)];
     }
@@ -93,13 +96,14 @@ class Agent {
     switch (this.status) {
       case "active":
         {
+          this.pedido = new Pedido(grid);
           let randX;
           let randY;
           do {
             randX = Math.floor(Math.random() * grid[0].length);
             randY = Math.floor(Math.random() * grid.length);
           } while (grid[randX][randY].shelf == false || grid[randX][randY].isTarget === true && (randX == this.cell.x && randY == this.cell.y));
-          this.targetCell = grid[randX][randY];
+          this.targetCell = this.pedido.celulaPrateleiraItem;
           break;
         }
 
@@ -111,7 +115,7 @@ class Agent {
 
       case "inDeliveryZone":
         {
-          this.targetCell = grid[grid.length / 2][grid[0].length - 2];
+          this.targetCell = this.pedido.celulaReceptor;
           break;
         }
 
@@ -164,7 +168,13 @@ class Agent {
       var line = new Array;
       for (var j = 0; j < grid[0].length; j++) {
         let cell = grid[i][j];
-        let blockedCell = cell.wall || (cell.shelf && cell != grid[this.targetCell.x][this.targetCell.y]) || (cell.agent.length > 0 && !(cell.agent.includes(this) && cell.agent.length == 1));
+        let w = cell.wall;
+        let s = cell.shelf && cell != grid[this.targetCell.x][this.targetCell.y];
+        let d = cell.receptor && cell != grid[this.pedido.celulaReceptor.x][this.pedido.celulaReceptor.y];
+        let a = cell.agent.length > 0 && !(cell.agent.includes(this) && cell.agent.length == 1);
+        let en = (this.status == "carrying" || this.status == "inDeliveryZone") && cell.depositAreaExit;
+        let ex = (this.status == "returning" || this.status == "delivered") && cell.depositAreaEntrance;
+        let blockedCell = w || s || d || a || en || ex;
         line[j] = blockedCell ? 0 : 1;
       }
       simplifiedGrid[i] = line;
@@ -180,10 +190,11 @@ class Agent {
     this.previousBestPath = this.bestPath;
     this.bestPath = result;
     if (result.length > 0) {
-      this.bestNextCell = grid[result[0].x][result[0].y];
+      this.bestNextCell = grid[this.bestPath[0].x][this.bestPath[0].y];
     } else {
       this.bestNextCell = undefined;
     }
+    debugger;
 
     this.updateSpacePerception();
 
@@ -223,18 +234,15 @@ class Agent {
     inputs[23] = this.cellLeftIsBest ? 1 : 0;
 
     //MUNDO PERFEITO
-    if(this.cellUpIsBest)
-    {
+    if (this.cellUpIsBest) {
       this.up(grid);
-    }else if(this.cellRigthIsBest){
+    } else if (this.cellRigthIsBest) {
       this.right(grid);
-    }
-    else if(this.cellDownIsBest){
+    } else if (this.cellDownIsBest) {
       this.down(grid);
-    }
-    else if(this.cellLeftIsBest){
+    } else if (this.cellLeftIsBest) {
       this.left(grid);
-    }else{
+    } else {
       this.stand();
     }
 

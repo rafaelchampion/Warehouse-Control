@@ -1,0 +1,114 @@
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <!-- Includes -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script language="javascript" type="text/javascript" src="addons/p5.js"></script>
+    <script language="javascript" type="text/javascript" src="addons/p5.dom.js"></script>
+    <script language="javascript" type="text/javascript" src="sketch.js"></script>
+    <script language="javascript" type="text/javascript" src="./libraries/cell.js"></script>
+    <script language="javascript" type="text/javascript" src="./libraries/receptor.js"></script>
+    <script language="javascript" type="text/javascript" src="./libraries/pedido.js"></script>
+    <script language="javascript" type="text/javascript" src="./libraries/agent.js"></script>
+    <script language="javascript" type="text/javascript" src="./libraries/nn.js"></script>
+    <script language="javascript" type="text/javascript" src="./libraries/ga.js"></script>
+    <script language="javascript" type="text/javascript" src="./libraries/astar.js"></script>
+    <script language="javascript" type="text/javascript" src="./libraries/matrix.js"></script>
+    <script language="javascript" type="text/javascript" src="./js/materialize.min.js"></script>
+    <link href="./css/materialize.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="css/custom.css">
+    <!-- Includes -->
+</head>
+
+<body class="grey lighten-5">
+    <nav class="blue-grey">
+        <ul>
+            <li>
+                <a href="genetic.html">Algoritmo Genético</a>
+            </li>
+            <li>
+                <a href="astar.html">Algoritmo A*</a>
+            </li>
+        </ul>
+    </nav>
+    <div class="row">
+        <div class="col m6 s12">
+            <div class="card" style="height:800px">
+                <div class="card-content">
+                    <div id="canvascontainer"></div>
+                </div>
+            </div>
+        </div>
+        <div class="col m4 s12">
+            <div class="card">
+                <div class="card-content">
+                    <table id="agentTable" style="width: 100%">
+                        <tr>
+                            <th style="width: 20%">
+                                <label>Agente</label>
+                            </th>
+                            <th style="width: 15%">
+                                <label>Pos.</label>
+                            </th>
+                            <th>
+                                <label>Alvo</label>
+                            </th>
+                            <th style="width:20%">
+                                <label>Stat.</label>
+                            </th>
+                            <th style="width: 15%">
+                                <label>Score</label>
+                            </th>
+                            <th>
+                                <label>Dist.</label>
+                            </th>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="col m2 s12">
+            <div class="card">
+                <div class="card-content">
+                    <label>Velocidade(</label>
+                    <label id="speed">1</label>
+                    <span>
+                        <label>)</label>
+                    </span>
+                    <br/>
+                    <input id="speedSlider" type="range" min="-10" max="10" value="1" style="width:250px">
+                    <br/>
+                    <label>Geração:</label>
+                    <label id="gen">1</label>
+                    <br/>
+                    <label>Maior pontuação atual:</label>
+                    <label id="actSco">0</label>
+                    <br/>
+                    <label>Maior pontuação:</label>
+                    <label id="sco">0</label>
+                    <br/>
+                    <br/>
+                    <label>
+                        <input type="checkbox" id="chkHideTableLines" />
+                        <span>Esconder linhas de agentes inativos</span>
+                    </label>
+                    <br />
+                    <br />
+                    <br />
+                    <button class="btn btn-primary" id="best">Rodar somente o melhor até o momento</button>
+                    <br/>
+                    <br/>
+                    <a href="javascript:void(0)" id="saveBest">
+                        <button class="btn btn-primary" onclick="saveBestAgentBrain()" id="saveBestButton ">Salvar melhor</button>
+                    </a>
+                    <br/>
+                    <br/>
+                    <button class="btn btn-primary" onclick="loadBrain()">Carregar cérebro</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
